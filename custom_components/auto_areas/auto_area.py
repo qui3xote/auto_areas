@@ -15,6 +15,8 @@ from custom_components.auto_areas.auto_lights import AutoLights
 from custom_components.auto_areas.const import AUTO_AREAS_RELEVANT_DOMAINS
 from custom_components.auto_areas.ha_helpers import get_all_entities
 
+from .const import CONFIG_MOTION_LIGHTS
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -26,7 +28,7 @@ class AutoArea(object):
         self.area = area
         self.area_name = area.name
         self.area_id = area.id
-        self.config = config.get(area.normalized_name, {})
+        self.config = config
         self.entities: Set[RegistryEntry] = set()
 
         if self.hass.is_running:
@@ -54,7 +56,8 @@ class AutoArea(object):
         self.entities = [entity for entity in entities if self.is_valid_entity(entity)]
 
         # Setup AutoLights
-        self.auto_lights = AutoLights(self.hass, self.entities, self.area, self.config)
+        if self.config.get(CONFIG_MOTION_LIGHTS):
+            self.auto_lights = AutoLights(self.hass, self.entities, self.area, self.config)
 
         for entity in self.entities:
             _LOGGER.info(

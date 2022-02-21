@@ -1,0 +1,8 @@
+auto_area:
+  is_sleeping_area: false
+  motion_lights: true
+  areas:
+    bedroom:
+      is_sleeping_area: true
+    living_room:
+      motion_lights: false
