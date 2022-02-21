@@ -12,6 +12,9 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import STATE_HOME, STATE_ON, STATE_PLAYING
 
+import voluptuous as vol
+from voluptuous.schema_builder import PREVENT_EXTRA
+
 NAME = "Auto Areas"
 DOMAIN = "auto_areas"
 DOMAIN_DATA = f"{DOMAIN}_data"
@@ -28,6 +31,32 @@ ENTITY_NAME_AREA_SLEEP_MODE = "switch.area_sleep_mode_"
 
 # Area Config options
 CONFIG_SLEEPING_AREA = "is_sleeping_area"
+CONFIG_MOTION_LIGHTS = "enable_motion_lights"
+
+CONFIG_OPTIONS = {
+    CONFIG_SLEEPING_AREA: False,
+    CONFIG_MOTION_LIGHTS: False
+}
+
+OPTIONS_SCHEMA = {
+    vol.Optional(
+        option,
+        default=default
+    ): type(default)
+    for option, default in CONFIG_OPTIONS.items()
+}
+
+AREA_CONFIG_SCHEMA = vol.Schema(
+    {str: OPTIONS_SCHEMA},
+    extra=PREVENT_EXTRA
+)
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        OPTIONS_SCHEMA,
+        vol.Any(AREA_CONFIG_SCHEMA, None)
+    }
+)
 
 # Entity gathering configuration
 AUTO_AREAS_RELEVANT_DOMAINS = [

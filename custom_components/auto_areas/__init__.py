@@ -8,19 +8,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
-from voluptuous.error import MultipleInvalid
-from voluptuous.schema_builder import PREVENT_EXTRA
 
 from custom_components.auto_areas.auto_area import AutoArea
 from custom_components.auto_areas.ha_helpers import set_data
 
-from .const import CONFIG_SLEEPING_AREA, DOMAIN, DOMAIN_DATA
+from voluptuous.error import MultipleInvalid
+
+from .const import DOMAIN, DOMAIN_DATA, CONFIG_SCHEMA, CONFIG_OPTIONS
 
 _LOGGER = logging.getLogger(__name__)
-
-area_config_schema = vol.Schema({CONFIG_SLEEPING_AREA: bool}, extra=PREVENT_EXTRA)
-config_schema = vol.Schema({str: {CONFIG_SLEEPING_AREA: bool}})
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -29,7 +25,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     # Load and validate config
     auto_areas_config: dict = config.get(DOMAIN) or {}
     try:
-        config_schema(auto_areas_config)
+        CONFIG_SCHEMA(auto_areas_config)
     except MultipleInvalid as exception:
         _LOGGER.error(
             "Configuration is invalid (validation message: '%s'). Config: %s",
@@ -45,7 +41,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     auto_areas: MutableMapping[str, AutoArea] = {}
 
     for area in area_registry.async_list_areas():
-        auto_areas[area.id] = AutoArea(hass, area, auto_areas_config)
+        area_config = config.get(area.normalized_name, None)
+
+        if area_config is None:
+            area_config = {
+                option: config.get(option) for option in CONFIG_OPTIONS.keys()
+            }
+
+        auto_areas[area.id] = AutoArea(hass, area, area_config)
 
     set_data(hass, DOMAIN_DATA, auto_areas)
 
