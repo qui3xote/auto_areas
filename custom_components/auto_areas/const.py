@@ -46,13 +46,12 @@ OPTIONS_SCHEMA = {
     for option, default in CONFIG_OPTIONS.items()
 }
 
-AREA_CONFIG_SCHEMA = vol.Schema(
-    {str: OPTIONS_SCHEMA},
-    extra=PREVENT_EXTRA
-)
-
 CONFIG_SCHEMA = vol.Schema(
-    OPTIONS_SCHEMA.update(vol.Any(AREA_CONFIG_SCHEMA, None))
+    {
+        vol.Optional(CONFIG_SLEEPING_AREA, default=False): bool,
+        vol.Optional(CONFIG_MOTION_LIGHTS, default=False): bool,
+        str: vol.Any(OPTIONS_SCHEMA, None)
+    }
 )
 
 # Entity gathering configuration
