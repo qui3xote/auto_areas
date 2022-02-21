@@ -52,10 +52,7 @@ AREA_CONFIG_SCHEMA = vol.Schema(
 )
 
 CONFIG_SCHEMA = vol.Schema(
-    {
-        OPTIONS_SCHEMA,
-        vol.Any(AREA_CONFIG_SCHEMA, None)
-    }
+    OPTIONS_SCHEMA.update(vol.Any(AREA_CONFIG_SCHEMA, None))
 )
 
 # Entity gathering configuration
