@@ -53,7 +53,7 @@ AREA_CONFIG_SCHEMA = vol.Schema(
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        OPTIONS_SCHEMA,
+        OPTIONS_SCHEMA.items(),
         vol.Any(AREA_CONFIG_SCHEMA, None)
     }
 )
